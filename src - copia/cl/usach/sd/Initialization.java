@@ -3,7 +3,6 @@ package cl.usach.sd;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Control;
-import peersim.core.Linkable;
 import peersim.core.Network;
 
 public class Initialization implements Control {
@@ -11,7 +10,6 @@ public class Initialization implements Control {
 
 	int idLayer;
 	int idTransport;
-	int idLink;
 
 	int argExample;
 
@@ -26,7 +24,12 @@ public class Initialization implements Control {
 		// que corresponden esa parte del protocolo
 		this.idLayer = Configuration.getPid(prefix + ".protocol");
 		this.idTransport = Configuration.getPid(prefix + ".transport");
-		this.idLink = Configuration.getPid(prefix + ".link");
+		// Configuration.getInt retorna el número del argumento
+		// que se encuentra en el archivo de configuración.
+		// También hay Configuration.getBoolean, .getString, etc...
+		this.argExample = Configuration.getInt(prefix + ".argExample");
+
+		System.out.println("Arg: " + argExample);
 	}
 
 	/**
@@ -35,8 +38,18 @@ public class Initialization implements Control {
 	 */
 	@Override
 	public boolean execute() {
-		System.out.println("Por defecto");
+		/**
+		 * Tira un número random el cual corresponderá a un Nodo de la red
+		 */
+		int idNode = CommonState.r.nextInt(Network.size());
+
+		/**
+		 * Asignar un valor al atributo del peer (o nodo) de la red
+		 */
+		int rand = CommonState.r.nextInt(100);
+		((ExampleNode) Network.get(idNode)).setCount(rand);
 
 		return true;
 	}
+
 }

@@ -11,7 +11,7 @@ public class Observer implements Control {
 	private int layerId;
 	private String prefix;
 
-	public static IncrementalStats cantDeUsosDelToken = new IncrementalStats();
+	public static IncrementalStats message = new IncrementalStats();
 
 	public Observer(String prefix) {
 		this.prefix = prefix;
@@ -28,9 +28,7 @@ public class Observer implements Control {
 		}
 
 		String s = String.format("[time=%d]:[with N=%d nodes] [%d Total send message]", CommonState.getTime(), size,
-				//(int) message.getSum()
-				(int) cantDeUsosDelToken.getSum()
-				);
+				(int) message.getSum());
 
 		System.err.println(s);
 
