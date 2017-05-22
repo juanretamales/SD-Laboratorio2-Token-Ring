@@ -10,7 +10,7 @@ public class RingTopology implements Control{
 	int idLink;
 	
 	public RingTopology(String prefix) {
-		this.idLink = Configuration.getPid(prefix + ".protocol");
+		this.idLink = Configuration.getPid(prefix + ".link");
 		System.out.println("Id Link: " + this.idLink);
 	}
 
@@ -20,16 +20,8 @@ public class RingTopology implements Control{
 		for (int i = 0; i < Network.size(); i++) {
 			ExampleNode node = (ExampleNode) Network.get(i);
 			ExampleNode randomVecino = (ExampleNode) Network.get(CommonState.r.nextInt(Network.size()));
-			
-			String s = String.format("Añadir vecinos [Node=%d] [RandomVecino=%d] [addNeighbor=%d]", 
-					node.getID(), 
-					randomVecino.getID(),
-					0
-					);
-			System.out.println(s);
-			
-			boolean exito = ((Linkable) node.getProtocol(this.idLink)).addNeighbor(randomVecino);
-			s = String.format("Añadir vecinos [Node=%d] [RandomVecino=%d] [addNeighbor=%d]", 
+			boolean exito=((Linkable) node.getProtocol(this.idLink)).addNeighbor(randomVecino);
+			String s = String.format("Añadir vecinos [Node=%d] [RandomVecino=%d] [addNeighbor=%b]", 
 					node.getID(), 
 					randomVecino.getID(),
 					exito
