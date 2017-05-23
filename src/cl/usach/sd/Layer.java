@@ -23,6 +23,23 @@ public class Layer implements Cloneable, EDProtocol {
 	 */
 	@Override
 	public void processEvent(Node myNode, int layerId, Object event) {
+		if(event instanceof Message)
+		{
+			if(((ExampleNode) myNode).getTockenFlag()==true)
+			{
+				//System.out.print("Evento es mensaje y tiene tokenFlag");
+				((ExampleNode) myNode).setTockenFlag(false);
+				Message message = (Message) event;
+				sendmessage(myNode, layerId, message);
+				//System.out.println(" - SE ENVIO MENSAJE");
+				// agrego 1 uso al cantDeUsosDelToken
+				Observer.cantDeUsosDelToken.add(1);
+			}
+			else
+			{
+				//System.out.println("Evento es mensaje pero NO tiene tokenFlag");
+			}
+		}
 		/*if(event.)//evento es Token
 			if(utilizoRC){
 				Message message = (Message) event;
@@ -33,7 +50,6 @@ public class Layer implements Cloneable, EDProtocol {
 			}
 		else
 			myNode.requieroToken()*/
-		System.out.println("Evento"+event.getClass().getName());
 	}
 
 	public void sendmessage(Node currentNode, int layerId, Object message) {

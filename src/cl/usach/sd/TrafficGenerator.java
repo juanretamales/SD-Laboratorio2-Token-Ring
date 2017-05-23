@@ -22,18 +22,19 @@ public class TrafficGenerator implements Control {
 	@Override
 	public boolean execute() {
 		if (!this.initToken) {
-			System.out.println("Antes de inicializar");
+			System.out.println("Antes de inicializar, no esta inicializado el token");
 			// Distribución uniforme entre [0-1]
 			double uniformRandom = CommonState.r.nextDouble();
 
 			// Considera cualquier nodo de manera aleatoria de la red
 			Node initNode = Network.get(CommonState.r.nextInt(Network.size()));
+			
+			((ExampleNode) initNode).setTockenFlag(true);
 
 			int sendNode = CommonState.r.nextInt(Network.size());
 
 			// Se crea un nuevo mensaje
-			Message message = new Message("Number random: " + uniformRandom,
-					sendNode);
+			Message message = new Message("Number random: " + uniformRandom, sendNode);
 
 			// Y se envía, para realizar la simulación
 			// Los parámetros corresponde a:
@@ -44,15 +45,18 @@ public class TrafficGenerator implements Control {
 			// caso
 			// de layerId)
 			EDSimulator.add(0, message, initNode, layerId);
+			
 			this.initToken = true;
 		} else {
-			System.out.println("Después de inicializar");
+			System.out.println("Después de inicializar, esta inicializado el mensaje");
 			// Distribución uniforme entre [0-1]
 			double uniformRandom = CommonState.r.nextDouble();
 
 			// Considera cualquier nodo de manera aleatoria de la red
 			Node initNode = Network.get(CommonState.r.nextInt(Network.size()));
 
+			((ExampleNode) initNode).setTockenFlag(false);
+			
 			int sendNode = CommonState.r.nextInt(Network.size());
 
 			// Se crea un nuevo mensaje
@@ -67,6 +71,7 @@ public class TrafficGenerator implements Control {
 			// caso
 			// de layerId)
 			EDSimulator.add(0, message, initNode, layerId);
+			//this.initToken = false;
 		}
 
 		return false;

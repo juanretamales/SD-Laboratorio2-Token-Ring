@@ -16,7 +16,7 @@ public class RingTopology implements Control{
 
 	@Override
 	public boolean execute() {
-		System.out.println("RingTopology:Execute()");
+		//System.out.println("RingTopology:Execute()");
 		for (int i = 0; i < Network.size(); i++) {
 			ExampleNode node = (ExampleNode) Network.get(i);
 			ExampleNode randomVecino = (ExampleNode) Network.get(CommonState.r.nextInt(Network.size()));
@@ -26,12 +26,9 @@ public class RingTopology implements Control{
 					randomVecino.getID(),
 					exito
 					);
-			System.out.println(s);
-			
-			
-			
+			//System.out.println(s);	
 		}
-
+/*
 		for (int i = 0; i < Network.size(); i++) {
 			ExampleNode node = (ExampleNode) Network.get(i);
 			System.out.print("Cant. de vecinos: "
@@ -41,7 +38,7 @@ public class RingTopology implements Control{
 					+ " | Nodo vecino: "
 					+ ((Linkable) node.getProtocol(this.idLink)).getNeighbor(0)
 							.getID());
-		}
+		}*/
 		
 		return false;
 	}
