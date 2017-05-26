@@ -1,5 +1,9 @@
 package cl.usach.sd;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import peersim.config.Configuration;
 import peersim.config.FastConfig;
 import peersim.core.CommonState;
@@ -15,7 +19,13 @@ public class Layer implements Cloneable, EDProtocol {
 	private static String prefix = null;
 	private int transportId;
 	private int layerId;
-
+	
+	private ExampleNode tokenShip;//Revisa quien tiene el proceso actual;
+	//private Message [][] mensajesPendientes;// Mensajes pendientes de cada Nodo, [IdNodo,mensajes]
+	private HashMap<Integer, Message[]> colaMSG = new HashMap<Integer, Message[]>();
+	//ArrayList<ArrayList<Message>> mensajesPendientes = new ArrayList<ArrayList<Message>>();
+	
+	
 	/**
 	 * Método en el cual se va a procesar el mensaje que ha llegado al Nodo
 	 * desde otro Nodo. Cabe destacar que el mensaje va a ser el evento descrito
@@ -23,22 +33,57 @@ public class Layer implements Cloneable, EDProtocol {
 	 */
 	@Override
 	public void processEvent(Node myNode, int layerId, Object event) {
+		//reviso si el tokenship (tocken) no esta perdido para restaurarlo
+		if(((ExampleNode) Network.get((int) tokenShip.getID()))==tokenShip)
+		{
+			System.out.print("El tocketship esta dentro de la red");
+		}
+		else
+		{
+			//Si hay un error en el tocketship se resetea en al primer nodo de la red segun el index;
+			//tokenShip=(ExampleNode) Network.get((int) Configuration.getPid(prefix + ".link"));
+			tokenShip=(ExampleNode) Network.get(0);
+		}
+		//Veo si el evento es de tipo mensaje para agregarlo a la cola
 		if(event instanceof Message)
+		{
+//			if(((ExampleNode) myNode).getTockenFlag()==true)
+//			{
+//				//System.out.print("Evento es mensaje y tiene tokenFlag");
+//				Message message = (Message) event;
+//				sendmessage(myNode, layerId, message);
+//				//System.out.println(" - SE ENVIO MENSAJE");
+//				// agrego 1 uso al cantDeUsosDelToken
+//				((ExampleNode) myNode).setTockenFlag(false);
+//				
+//				Observer.cantDeUsosDelToken.add(1);
+//			}
+//			else
+//			{
+//				System.out.println("Evento es mensaje pero NO tiene tokenFlag");
+//			}
+			//mensajesPendientes[(int) myNode.getID()][mensajesPendientes.length]=(Message) event;
+			Message[] mensajesPendiente = colaMSG.get((int) myNode.getID());
+			mensajesPendiente[mensajesPendiente.length]=(Message) event;
+			colaMSG.remove((int) myNode.getID());
+			colaMSG.put((int) myNode.getID(), mensajesPendiente);
+		}
+		// Veo si el tocken esta en el nodo
+		if(tokenShip.getID()==myNode.getID())
 		{
 			if(((ExampleNode) myNode).getTockenFlag()==true)
 			{
-				//System.out.print("Evento es mensaje y tiene tokenFlag");
+				Message[] mensajesPendiente = colaMSG.get((int) myNode.getID());
+				//Message[] tempMessage=mensajesPendientes[(int) myNode.getID()];
+				for(int i=0;i<mensajesPendiente.length;i++)
+				{
+					sendmessage(myNode, layerId, mensajesPendiente[i]);
+				}
+				colaMSG.remove((int) myNode.getID());
 				((ExampleNode) myNode).setTockenFlag(false);
-				Message message = (Message) event;
-				sendmessage(myNode, layerId, message);
-				//System.out.println(" - SE ENVIO MENSAJE");
-				// agrego 1 uso al cantDeUsosDelToken
-				Observer.cantDeUsosDelToken.add(1);
 			}
-			else
-			{
-				//System.out.println("Evento es mensaje pero NO tiene tokenFlag");
-			}
+			tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
+			
 		}
 		/*if(event.)//evento es Token
 			if(utilizoRC){

@@ -28,6 +28,8 @@ public class RingTopology implements Control{
 					);
 			//System.out.println(s);	
 		}
+		
+		
 /*
 		for (int i = 0; i < Network.size(); i++) {
 			ExampleNode node = (ExampleNode) Network.get(i);
