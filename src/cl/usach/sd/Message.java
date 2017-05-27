@@ -7,6 +7,11 @@ public class Message {
 	private String text;
 	private int destination;
 
+	
+	public Message(String text) {
+		this.setText(text);
+	}
+	
 	public Message(String text, int destination) {
 		this.setText(text);
 		this.setDestination(destination);

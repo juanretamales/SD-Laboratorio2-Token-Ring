@@ -12,6 +12,8 @@ public class TrafficGenerator implements Control {
 	private final int layerId;
 
 	boolean initToken;
+	
+	int step=0;
 
 	public TrafficGenerator(String prefix) {
 		layerId = Configuration.getPid(prefix + "." + PAR_PROT);
@@ -25,16 +27,21 @@ public class TrafficGenerator implements Control {
 			System.out.println("Antes de inicializar, no esta inicializado el token");
 			// Distribución uniforme entre [0-1]
 			double uniformRandom = CommonState.r.nextDouble();
-
+			
+			//creo mensaje token para ir pasandolo
+			Message token = new Message("TOKEN");
+			
+			
+			
 			// Considera cualquier nodo de manera aleatoria de la red
 			Node initNode = Network.get(CommonState.r.nextInt(Network.size()));
 			
-			((ExampleNode) initNode).setTockenFlag(true);
+//			((ExampleNode) initNode).setTockenFlag(true);
 
 			int sendNode = CommonState.r.nextInt(Network.size());
 
 			// Se crea un nuevo mensaje
-			Message message = new Message("Number random: " + uniformRandom, sendNode);
+			//Message message = new Message("Number random: " + uniformRandom, sendNode);
 
 			// Y se envía, para realizar la simulación
 			// Los parámetros corresponde a:
@@ -44,9 +51,11 @@ public class TrafficGenerator implements Control {
 			// int arg3: Número de la capa del protocolo que creamos (en este
 			// caso
 			// de layerId)
-			EDSimulator.add(0, message, initNode, layerId);
-			
+
 			this.initToken = true;
+//			EDSimulator.add(0, message, initNode, layerId);
+			EDSimulator.add(0, token, initNode, layerId);
+			
 		} else {
 			System.out.println("Después de inicializar, esta inicializado el mensaje");
 			// Distribución uniforme entre [0-1]
@@ -60,7 +69,7 @@ public class TrafficGenerator implements Control {
 			int sendNode = CommonState.r.nextInt(Network.size());
 
 			// Se crea un nuevo mensaje
-			Message message = new Message("Necesito RC",sendNode);
+			Message message = new Message("Necesito TOKEN",sendNode);
 
 			// Y se envía, para realizar la simulación
 			// Los parámetros corresponde a:

@@ -4,11 +4,17 @@ import peersim.core.GeneralNode;
 
 public class ExampleNode extends GeneralNode {
 	private int count;
-	private boolean tockenFlag;
+	private boolean tockenFlag;//true o false segun necesita o no tocken
 
 	public ExampleNode(String prefix) {
 		super(prefix);
 		this.setCount(0);
+	}
+	
+	public ExampleNode(String prefix, boolean flag) {
+		super(prefix);
+		this.setCount(0);
+		this.setTockenFlag(flag);
 	}
 
 	public int getCount() {
