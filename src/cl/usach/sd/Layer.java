@@ -16,121 +16,53 @@ public class Layer implements Cloneable, EDProtocol {
 	private int transportId;
 	private int layerId;
 	
-	private ExampleNode tokenShip;//Revisa quien tiene el proceso actual;
-	//private Message [][] mensajesPendientes;// Mensajes pendientes de cada Nodo, [IdNodo,mensajes]
-	private HashMap<Integer, Message[]> colaMSG = new HashMap<Integer, Message[]>();
-	//ArrayList<ArrayList<Message>> mensajesPendientes = new ArrayList<ArrayList<Message>>();
-	
-	long time_start;
-	long time_wait=30;/*Tiempo de espera en segundos*/
+//	private ExampleNode tokenShip;//Revisa quien tiene el proceso actual;
+////	int idTokenActual = 1; /*Guarda ID del token*/
+//	
+//	long time_start;
+//	long time_wait=30000;/*Tiempo de espera en milisegundos*/
 	/**
 	 * Método en el cual se va a procesar el mensaje que ha llegado al Nodo
 	 * desde otro Nodo. Cabe destacar que el mensaje va a ser el evento descrito
 	 * en la clase, a través de la simulación de eventos discretos.
 	 */
 	@Override
-	public void processEvent(Node myNode, int layerId, Object event) {
-		//reviso si el tokenship (tocken) no esta perdido para restaurarlo
-//		if(((ExampleNode) Network.get((int) tokenShip.getID()))==tokenShip)
-//		{
-//			System.out.print("El tocketship esta dentro de la red");
-//		}
-//		else
-//		{
-//			tokenShip=(ExampleNode) Network.get(0);
-//		}
-//		//Veo si el evento es de tipo mensaje para agregarlo a la cola
-//		if(event instanceof Message)
-//		{
-////			if(((ExampleNode) myNode).getTockenFlag()==true)
-////			{
-////				//System.out.print("Evento es mensaje y tiene tokenFlag");
-////				Message message = (Message) event;
-////				sendmessage(myNode, layerId, message);
-////				//System.out.println(" - SE ENVIO MENSAJE");
-////				// agrego 1 uso al cantDeUsosDelToken
-////				((ExampleNode) myNode).setTockenFlag(false);
-////				
-////				Observer.cantDeUsosDelToken.add(1);
-////			}
-////			else
-////			{
-////				System.out.println("Evento es mensaje pero NO tiene tokenFlag");
-////			}
-//			//mensajesPendientes[(int) myNode.getID()][mensajesPendientes.length]=(Message) event;
-//			Message[] mensajesPendiente = colaMSG.get((int) myNode.getID());
-//			mensajesPendiente[mensajesPendiente.length]=(Message) event;
-//			colaMSG.remove((int) myNode.getID());
-//			colaMSG.put((int) myNode.getID(), mensajesPendiente);
-//		}
-		/*Si no necesito el token*/
-//		if(((ExampleNode) myNode).getTockenFlag()==false)
-//		{
-		/*Si me llega algo que no es token*/
-		if(!((Message) event).getText().equals("TOKEN"))
+	public void processEvent(Node myNode, int layerId, Object event) 
+	{
+		System.out.println("processEvent:{node:["+myNode.getID()+"],event["+((Message) event).getText()+"]}");
+		if(((ExampleNode) myNode).getTengoToken()) /*reviso Si contiene TOKEN*/
 		{
-			long time_current = System.currentTimeMillis();
-			if((time_current-this.time_start)>=this.time_wait)
+			if(((ExampleNode) myNode).getTockenFlag())/* reviso si Necesito token*/
 			{
-				Message message = new Message("TOKEN");
+				/*consumo el recurso(envio un mensaje random)*/
+				Message message = new Message("El nodo:["+myNode.getID()+"] consumio el token");
+				System.out.println(message.getText());
 				sendmessage(myNode,layerId,message);
-				System.out.println("Se perdio el token, recuperando...");
 			}
+			
+			Observer.cantDeUsosDelToken.add(1);/*Ahumento el observer*/
+			
+			((ExampleNode) myNode).setTockenFlag(false);/*Combio estado del nodo actual para decir que ya no necesita el token*/
+			
+			ExampleNode tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
+			tokenShip.setTengoToken(true);/*le doy el token a mi vecino a mi vecino*/
+			System.out.println("Enviando token de ["+myNode.getID()+"] a ["+tokenShip.getID()+"]");
 		}
-			/*Y me llega un mensaje TOKEN*/
-			if(((Message) event).getText().equals("TOKEN"))
-			{
-				/*Necesito token*/
-				if(((ExampleNode) myNode).getTockenFlag())
-				{
-					/*consumo el recurso(envio un mensaje random)*/
-					Message message = new Message("El nodo:["+myNode.getID()+"] consumio el token");
-					System.out.println(message.getText());
-					sendmessage(myNode,layerId,message);
-				}
-				/*se lo doy a mi vecino*/
-				Observer.cantDeUsosDelToken.add(1);
-				((ExampleNode) myNode).setTockenFlag(false);
-				tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
-				time_start = System.currentTimeMillis();
-			}
-//		}
 		/*Reviso si el mensaj es Necesito TOKEN*/
-		if(((Message) event).getText().equals("Necesito TOKEN"))
+		if(((Message) event).getText().equals("Necesito token"))
 		{
 			/*Necesito token*/
 			((ExampleNode) myNode).setTockenFlag(true);
 		}
-		// Veo si el tocken esta en el nodo
-//		if(tokenShip.getID()==myNode.getID())
-//		{
-//			if(((ExampleNode) myNode).getTockenFlag()==true)
-//			{
-////				Message[] mensajesPendiente = colaMSG.get((int) myNode.getID());
-////				//Message[] tempMessage=mensajesPendientes[(int) myNode.getID()];
-////				for(int i=0;i<mensajesPendiente.length;i++)
-////				{
-////					sendmessage(myNode, layerId, mensajesPendiente[i]);
-////				}
-////				colaMSG.remove((int) myNode.getID());
-////				((ExampleNode) myNode).setTockenFlag(false);
-//			}
-//		}
-			
-			
-		/*if(event.)//evento es Token
-			if(utilizoRC){
-				Message message = (Message) event;
-				sendmessage(myNode, layerId, message);
-				Observer.cantDeUsosDelToken.add(1);
-			} else {
-				                                                                                                            
-			}
-		else
-			myNode.requieroToken()*/
+//		tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
+//		System.out.println("Enviando token de ["+myNode.getID()+"] a ["+tokenShip.getID()+"]");
+		
 	}
 
 	public void sendmessage(Node currentNode, int layerId, Object message) {
+		
+		
+		
 		/**
 		 * Random degree
 		 */
@@ -177,7 +109,6 @@ public class Layer implements Cloneable, EDProtocol {
 		layerId = transportId + 1;
 		
 
-		time_start = System.currentTimeMillis();
 	}
 
 	private Node searchNode(int id) {

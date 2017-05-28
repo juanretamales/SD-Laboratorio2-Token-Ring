@@ -23,6 +23,8 @@ public class TrafficGenerator implements Control {
 
 	@Override
 	public boolean execute() {
+//		step++;
+//		System.out.println("Traffic generator:["+step+"]");
 		if (!this.initToken) {
 			System.out.println("Antes de inicializar, no esta inicializado el token");
 			// Distribución uniforme entre [0-1]
@@ -64,12 +66,12 @@ public class TrafficGenerator implements Control {
 			// Considera cualquier nodo de manera aleatoria de la red
 			Node initNode = Network.get(CommonState.r.nextInt(Network.size()));
 
-			((ExampleNode) initNode).setTockenFlag(false);
+			((ExampleNode) initNode).setTockenFlag(true);
 			
 			int sendNode = CommonState.r.nextInt(Network.size());
 
 			// Se crea un nuevo mensaje
-			Message message = new Message("Necesito TOKEN",sendNode);
+			Message message = new Message("Necesito token",sendNode);
 
 			// Y se envía, para realizar la simulación
 			// Los parámetros corresponde a:
