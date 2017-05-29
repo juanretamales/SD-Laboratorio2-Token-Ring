@@ -40,12 +40,12 @@ public class Layer implements Cloneable, EDProtocol {
 				sendmessage(myNode,layerId,message);
 			}
 			
-			Observer.cantDeUsosDelToken.add(1);/*Ahumento el observer*/
+			Observer.cantDeUsosDelToken.add(1);/*Aumento el observer*/
 			
 			((ExampleNode) myNode).setTockenFlag(false);/*Combio estado del nodo actual para decir que ya no necesita el token*/
-			
+			((ExampleNode) myNode).setTengoToken(false);/*Combio estado del nodo actual para decir que ya tiene el token*/
 			ExampleNode tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
-			tokenShip.setTengoToken(true);/*le doy el token a mi vecino a mi vecino*/
+			tokenShip.setTengoToken(true);/*le doy el token a mi vecino a mi vecino // cambio estado del nodo vecino para decir que ya tiene toen*/
 			System.out.println("Enviando token de ["+myNode.getID()+"] a ["+tokenShip.getID()+"]");
 		}
 		/*Reviso si el mensaj es Necesito TOKEN*/

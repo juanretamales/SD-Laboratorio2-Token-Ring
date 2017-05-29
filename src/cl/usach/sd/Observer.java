@@ -10,16 +10,21 @@ public class Observer implements Control {
 
 	private int layerId;
 	private String prefix;
+	private int waitTime;/*Cada X segundos ejecuta verificar nodo*/
+	private int lostTime;/*Cada Y segundos ejecuta perder token*/
 
 	public static IncrementalStats cantDeUsosDelToken = new IncrementalStats();
 
 	public Observer(String prefix) {
 		this.prefix = prefix;
 		this.layerId = Configuration.getPid(prefix + ".protocol");
+		this.waitTime=Configuration.getInt(prefix + ".waitTime");
+		this.lostTime=Configuration.getInt(prefix + ".lostTime");
 	}
 
 	@Override
 	public boolean execute() {
+		
 		int size = Network.size();
 		for (int i = 0; i < Network.size(); i++) {
 			if (!Network.get(i).isUp()) {
@@ -34,8 +39,19 @@ public class Observer implements Control {
 
 		System.err.println(s);
 		/*Revisando la red si alguien tiene el token*/
-		int waitTime=2000;/*Cada 2 segundos ejecuta el siguiente segmento*/
-		if(CommonState.getTime()%waitTime==0)
+		if(CommonState.getTime()%this.lostTime==0)
+		{
+			for (int i = 0; i < Network.size(); i++) {
+				ExampleNode node = (ExampleNode) Network.get(i);
+				if(node.getTengoToken()==true)
+				{
+					node.setTengoToken(false);
+					System.err.println(" El token lo tenia el nodo:["+node.getID()+"] ");
+					break;
+				}
+			}
+		}
+		if(CommonState.getTime()%this.waitTime==0)
 		{
 			int encontrado=-1;
 			for (int i = 0; i < Network.size(); i++) {
@@ -52,11 +68,13 @@ public class Observer implements Control {
 			}
 			else
 			{
-				System.err.println("Token perdido, dando al nodo al primero de la red");
 				ExampleNode node = (ExampleNode) Network.get(0);
 				node.setTengoToken(true);
+				System.err.println("Token perdido, dando al nodo:["+node.getID()+"]");
+				
 			}
 		}
+		
 		return false;
 	}
 
