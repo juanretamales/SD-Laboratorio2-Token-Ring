@@ -30,6 +30,7 @@ public class Layer implements Cloneable, EDProtocol {
 	public void processEvent(Node myNode, int layerId, Object event) 
 	{
 		System.out.println("processEvent:{node:["+myNode.getID()+"],event["+((Message) event).getText()+"]}");
+		
 		if(((ExampleNode) myNode).getTengoToken()) /*reviso Si contiene TOKEN*/
 		{
 			if(((ExampleNode) myNode).getTockenFlag())/* reviso si Necesito token*/
@@ -39,9 +40,13 @@ public class Layer implements Cloneable, EDProtocol {
 				System.out.println(message.getText());
 				sendmessage(myNode,layerId,message);
 			}
+			Message msg = new Message("TOKEN");
+			sendmessage(myNode,layerId,msg);
 			
+		}
+		if(((Message) event).getText().equals("TOKEN"))
+		{
 			Observer.cantDeUsosDelToken.add(1);/*Aumento el observer*/
-			
 			((ExampleNode) myNode).setTockenFlag(false);/*Combio estado del nodo actual para decir que ya no necesita el token*/
 			((ExampleNode) myNode).setTengoToken(false);/*Combio estado del nodo actual para decir que ya tiene el token*/
 			ExampleNode tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
@@ -80,6 +85,19 @@ public class Layer implements Cloneable, EDProtocol {
 					+ ((Linkable) currentNode.getProtocol(0)).getNeighbor(i).getID());
 		}
 
+		/**
+		 * Envió del dato a través de la capa de transporte, la cual enviará
+		 * según el ID del emisor y el receptor
+		 */
+		((Transport) currentNode.getProtocol(transportId)).send(currentNode, sendNode, message, layerId);
+		// Otra forma de hacerlo
+		// ((Transport)
+		// currentNode.getProtocol(FastConfig.getTransport(layerId))).send(currentNode,
+		// searchNode(sendNode), message, layerId);
+
+	}
+public void sendmessage(Node currentNode, int layerId,Node sendNode, Object message) {
+		
 		/**
 		 * Envió del dato a través de la capa de transporte, la cual enviará
 		 * según el ID del emisor y el receptor
