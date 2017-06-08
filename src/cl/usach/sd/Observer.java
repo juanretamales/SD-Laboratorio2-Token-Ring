@@ -39,7 +39,7 @@ public class Observer implements Control {
 				(int) cantDeUsosDelToken.getSum()
 				);
 
-		System.err.println(s);
+//		System.err.println(s);
 		/*Revisando la red si alguien tiene el token*/
 		/*-Cada %lostTime tiempo buscara el/los nodos y los quitara*/
 		if(CommonState.getTime()%this.lostTime==0)
