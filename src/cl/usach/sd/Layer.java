@@ -16,11 +16,6 @@ public class Layer implements Cloneable, EDProtocol {
 	private int transportId;
 	private int layerId;
 	
-//	private ExampleNode tokenShip;//Revisa quien tiene el proceso actual;
-////	int idTokenActual = 1; /*Guarda ID del token*/
-//	
-//	long time_start;
-//	long time_wait=30000;/*Tiempo de espera en milisegundos*/
 	/**
 	 * Método en el cual se va a procesar el mensaje que ha llegado al Nodo
 	 * desde otro Nodo. Cabe destacar que el mensaje va a ser el evento descrito
@@ -36,8 +31,8 @@ public class Layer implements Cloneable, EDProtocol {
 			if(((ExampleNode) myNode).getTockenFlag())/* reviso si Necesito token*/
 			{
 				/*consumo el recurso(envio un mensaje random)*/
-				Message message = new Message("El nodo:["+myNode.getID()+"] consumio el token");
-				System.out.println(message.getText());
+				Message message = new Message("    El nodo:["+myNode.getID()+"] consumio el token");
+//				System.out.println(message.getText());
 				sendmessage(myNode,layerId,message);
 			}
 			Message msg = new Message("TOKEN");
@@ -51,7 +46,7 @@ public class Layer implements Cloneable, EDProtocol {
 			((ExampleNode) myNode).setTengoToken(false);/*Combio estado del nodo actual para decir que ya tiene el token*/
 			ExampleNode tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
 			tokenShip.setTengoToken(true);/*le doy el token a mi vecino a mi vecino // cambio estado del nodo vecino para decir que ya tiene toen*/
-			System.out.println("Enviando token de ["+myNode.getID()+"] a ["+tokenShip.getID()+"]");
+			System.out.println("    Enviando token de ["+myNode.getID()+":"+((ExampleNode) myNode).getTengoToken()+"] a ["+tokenShip.getID()+":"+((ExampleNode) tokenShip).getTengoToken()+"]");
 		}
 		/*Reviso si el mensaj es Necesito TOKEN*/
 		if(((Message) event).getText().equals("Necesito token"))
@@ -97,7 +92,7 @@ public class Layer implements Cloneable, EDProtocol {
 
 	}
 public void sendmessage(Node currentNode, int layerId,Node sendNode, Object message) {
-		
+
 		/**
 		 * Envió del dato a través de la capa de transporte, la cual enviará
 		 * según el ID del emisor y el receptor

@@ -12,6 +12,7 @@ public class Observer implements Control {
 	private String prefix;
 	private int waitTime;/*Cada X segundos ejecuta verificar nodo*/
 	private int lostTime;/*Cada Y segundos ejecuta perder token*/
+	private int recoveryTime;
 
 	public static IncrementalStats cantDeUsosDelToken = new IncrementalStats();
 
@@ -20,6 +21,7 @@ public class Observer implements Control {
 		this.layerId = Configuration.getPid(prefix + ".protocol");
 		this.waitTime=Configuration.getInt(prefix + ".waitTime");
 		this.lostTime=Configuration.getInt(prefix + ".lostTime");
+		this.recoveryTime=Configuration.getInt(prefix + ".recoveryTime");
 	}
 
 	@Override
@@ -39,6 +41,7 @@ public class Observer implements Control {
 
 		System.err.println(s);
 		/*Revisando la red si alguien tiene el token*/
+		/*-Cada %lostTime tiempo buscara el/los nodos y los quitara*/
 		if(CommonState.getTime()%this.lostTime==0)
 		{
 			for (int i = 0; i < Network.size(); i++) {
@@ -47,34 +50,45 @@ public class Observer implements Control {
 				{
 					node.setTengoToken(false);
 					System.err.println(" El token lo tenia el nodo:["+node.getID()+"] ");
-					break;
+					//break;
 				}
 			}
 		}
-		if(CommonState.getTime()%this.waitTime==0)
+		/*WaitTime es tiempo de espera minimo antes de iniciar recuperacion*/
+		if(CommonState.getTime()>this.waitTime)
 		{
-			int encontrado=-1;
-			for (int i = 0; i < Network.size(); i++) {
-				ExampleNode node = (ExampleNode) Network.get(i);
-				if(node.getTengoToken()==true)
+			/*-Cada %waitTime tiempo buscara el/los nodos y revisara si existe el token, de no encontrar, se aplicaran politica de seleccion*/
+			if(CommonState.getTime()%this.recoveryTime==0)
+			{
+				int encontrado=-1;
+				/*Aprovecho de buscar el nodo con id mas grande para aplicar politica de seleccion*/
+				ExampleNode nodoMasGrande=(ExampleNode) Network.get(0);
+				for (int i = 0; i < Network.size(); i++) {
+					ExampleNode node = (ExampleNode) Network.get(i);
+	
+					if(node.getTengoToken()==true)
+					{
+						encontrado=(int) node.getID();
+						break;
+					}
+					
+					if(node.getID()>nodoMasGrande.getID())
+					{
+						nodoMasGrande=node;
+					}
+				}
+				if(encontrado!=-1)
 				{
-					encontrado=(int) node.getID();
-					break;
+					System.err.println(" El token lo tiene nodo:["+encontrado+"] ");
+				}
+				else
+				{
+					nodoMasGrande.setTengoToken(true);
+					System.err.println("Token perdido, dando al nodo:["+nodoMasGrande.getID()+"]");
+					
 				}
 			}
-			if(encontrado!=-1)
-			{
-				System.err.println(" El token lo tiene nodo:["+encontrado+"] ");
-			}
-			else
-			{
-				ExampleNode node = (ExampleNode) Network.get(0);
-				node.setTengoToken(true);
-				System.err.println("Token perdido, dando al nodo:["+node.getID()+"]");
-				
-			}
 		}
-		
 		return false;
 	}
 

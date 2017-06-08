@@ -59,7 +59,7 @@ public class TrafficGenerator implements Control {
 			EDSimulator.add(0, token, initNode, layerId);
 			
 		} else {
-			System.out.println("Después de inicializar, esta inicializado el mensaje");
+//			System.out.println("Despues de inicializar, esta inicializado el mensaje");
 			// Distribución uniforme entre [0-1]
 			double uniformRandom = CommonState.r.nextDouble();
 
@@ -72,7 +72,7 @@ public class TrafficGenerator implements Control {
 
 			// Se crea un nuevo mensaje
 			Message message = new Message("Necesito token",sendNode);
-
+			
 			// Y se envía, para realizar la simulación
 			// Los parámetros corresponde a:
 			// long arg0: Delay del evento
