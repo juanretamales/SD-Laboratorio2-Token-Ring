@@ -1,6 +1,7 @@
 package cl.usach.sd;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -15,6 +16,8 @@ public class Layer implements Cloneable, EDProtocol {
 	private static String prefix = null;
 	private int transportId;
 	private int layerId;
+	private int mindelayTime;
+	private int maxdelayTime;
 	
 	/**
 	 * Método en el cual se va a procesar el mensaje que ha llegado al Nodo
@@ -41,7 +44,20 @@ public class Layer implements Cloneable, EDProtocol {
 //				System.out.println(message.getText());
 				sendmessage(myNode,layerId,message);
 			}
+			/*Tiempo de espera random para enviar mensaje token fuente: http://chuwiki.chuidiang.org/index.php?title=Generar_n%C3%BAmeros_aleatorios_en_Java */
 			Message msg = new Message("TOKEN");
+			int delayTime=(int) (Math.floor(Math.random()*this.maxdelayTime+this.mindelayTime));
+			try        
+			{
+				System.out.println("- Esperando durante:(["+delayTime+"]) ms");
+				//TimeUnit.SECONDS.sleep((long) delayTime);
+				TimeUnit.MILLISECONDS.sleep(delayTime);
+				
+			} 
+			catch(InterruptedException ex) 
+			{
+			    Thread.currentThread().interrupt();
+			}
 			sendmessage(myNode,layerId,msg);
 		}
 		if(((Message) event).getText().equals("TOKEN"))
@@ -152,11 +168,12 @@ public class Layer implements Cloneable, EDProtocol {
 		 */
 		Layer.prefix = prefix;
 		transportId = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
+		maxdelayTime = Configuration.getInt(prefix + ".maxdelay");
+		mindelayTime = Configuration.getInt(prefix + ".mindelay");
 		/**
 		 * Siguiente capa del protocolo
 		 */
 		layerId = transportId + 1;
-		
 
 	}
 
