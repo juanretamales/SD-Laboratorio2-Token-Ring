@@ -6,6 +6,7 @@ public class ExampleNode extends GeneralNode {
 	private int count;
 	private boolean tockenFlag;//true o false segun necesita o no tocken
 	private boolean tengoToken;
+	private double tiempoConToken;
 
 	public ExampleNode(String prefix) {
 		super(prefix);
@@ -43,5 +44,13 @@ public class ExampleNode extends GeneralNode {
 
 	public void setTengoToken(boolean tengoToken) {
 		this.tengoToken = tengoToken;
+	}
+
+	public double getTiempoConToken() {
+		return tiempoConToken;
+	}
+
+	public void setTiempoConToken(double tiempoConToken) {
+		this.tiempoConToken = tiempoConToken;
 	}
 }

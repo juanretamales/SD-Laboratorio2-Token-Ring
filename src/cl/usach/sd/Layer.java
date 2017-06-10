@@ -27,7 +27,23 @@ public class Layer implements Cloneable, EDProtocol {
 	@Override
 	public void processEvent(Node myNode, int layerId, Object event) 
 	{
-		System.out.println("processEvent:{node:["+myNode.getID()+"],event["+((Message) event).getText()+"]}");
+		/*Por cada evento en layer, busco al nodo con el token, y comparo su tiempo, si es igual o menos a el tiempo actual, envia un mensaje para pasar al token */	
+		for (int i = 0; i < Network.size(); i++) 
+		{
+			ExampleNode node = (ExampleNode) Network.get(i);
+			if(node.getTengoToken()==true)
+			{
+				if(((ExampleNode) node).getTiempoConToken()<=CommonState.getTime())
+				{
+					System.out.println("El tiempo para usar el token del nodo ["+((ExampleNode) node).getID()+"] expiro, pasando el token");
+					Message msg = new Message("TOKEN");
+					sendmessage(node,layerId,msg);
+					break;
+				}
+			}
+		}
+		
+		System.out.println("processEvent:{node:["+myNode.getID()+"],event["+((Message) event).getText()+"],onTime:["+CommonState.getTime()+"]}");
 		
 		if(((Message) event).getText().equals("Necesito token"))
 		{
@@ -44,21 +60,21 @@ public class Layer implements Cloneable, EDProtocol {
 //				System.out.println(message.getText());
 				sendmessage(myNode,layerId,message);
 			}
-			/*Tiempo de espera random para enviar mensaje token fuente: http://chuwiki.chuidiang.org/index.php?title=Generar_n%C3%BAmeros_aleatorios_en_Java */
-			Message msg = new Message("TOKEN");
-			int delayTime=(int) (Math.floor(Math.random()*this.maxdelayTime+this.mindelayTime));
-			try        
+			
+//			/*Tiempo de espera random para enviar mensaje token fuente: http://chuwiki.chuidiang.org/index.php?title=Generar_n%C3%BAmeros_aleatorios_en_Java */
+//			
+//			int delayTime=(int) (Math.floor(Math.random()*this.maxdelayTime+this.mindelayTime));
+//			((ExampleNode) myNode).setTiempoConToken(CommonState.getTime()+delayTime);
+//			System.out.println("El nodo ["+((ExampleNode) myNode).getID()+"] tendra el token por ["+((ExampleNode) myNode).getTiempoConToken()+"="+CommonState.getTime()+"+"+delayTime+"] tiempo");
+			
+//			Message msg = new Message("TOKEN");
+//			sendmessage(myNode,layerId,msg);
+			/*Termine de ocupar el recurso y reviso si mi tiempo para el uso de token termino*/
+			if(((ExampleNode) myNode).getTiempoConToken()<=CommonState.getTime())
 			{
-				System.out.println("- Esperando durante:(["+delayTime+"]) ms");
-				//TimeUnit.SECONDS.sleep((long) delayTime);
-				TimeUnit.MILLISECONDS.sleep(delayTime);
-				
-			} 
-			catch(InterruptedException ex) 
-			{
-			    Thread.currentThread().interrupt();
+				Message msg = new Message("TOKEN");
+				sendmessage(myNode,layerId,msg);
 			}
-			sendmessage(myNode,layerId,msg);
 		}
 		if(((Message) event).getText().equals("TOKEN"))
 		{
@@ -77,6 +93,8 @@ public class Layer implements Cloneable, EDProtocol {
 		
 //		tokenShip=(ExampleNode) ((Linkable) myNode.getProtocol(0)).getNeighbor(0);
 //		System.out.println("Enviando token de ["+myNode.getID()+"] a ["+tokenShip.getID()+"]");
+		
+		
 		
 	}
 
@@ -115,9 +133,17 @@ public class Layer implements Cloneable, EDProtocol {
 			Observer.cantDeUsosDelToken.add(1);/*Aumento el observer*/
 			((ExampleNode) currentNode).setTockenFlag(false);/*Combio estado del nodo actual para decir que ya no necesita el token*/
 			((ExampleNode) currentNode).setTengoToken(false);/*Combio estado del nodo actual para decir que ya tiene el token*/
+			((ExampleNode) currentNode).setTiempoConToken(0);/*Guardo en cero el tiempo que debo estar con token*/
 			ExampleNode tokenShip=(ExampleNode) ((Linkable) currentNode.getProtocol(0)).getNeighbor(0);
 			tokenShip.setTengoToken(true);/*le doy el token a mi vecino a mi vecino // cambio estado del nodo vecino para decir que ya tiene toen*/
-			System.out.println("    Enviando token de ["+currentNode.getID()+"] a ["+tokenShip.getID()+"]");
+			/*Tiempo de espera random para enviar mensaje token fuente: http://chuwiki.chuidiang.org/index.php?title=Generar_n%C3%BAmeros_aleatorios_en_Java */
+			
+			int delayTime=(int) (Math.floor(Math.random()*this.maxdelayTime+this.mindelayTime));
+			((ExampleNode) currentNode).setTiempoConToken(CommonState.getTime()+delayTime);
+			
+//			System.out.println("El nodo ["+((ExampleNode) currentNode).getID()+"] tendra el token por ["+((ExampleNode) currentNode).getTiempoConToken()+"] tiempo");
+			
+			System.out.println("    Enviando token de ["+currentNode.getID()+"] a ["+tokenShip.getID()+"] y lo mantendra por ["+((ExampleNode) currentNode).getTiempoConToken()+"] tiempo");
 //			if(((ExampleNode) tokenShip).getTockenFlag())
 //			{
 //				Message msg2 = new Message("El nodo:["+tokenShip.getID()+"] consumio el token");
